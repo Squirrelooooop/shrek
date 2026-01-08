@@ -24,7 +24,12 @@ results = []
 
 for f in files:
   print(f.name)
-  img = tifffile.imread(f)[0]
+  img = tifffile.imread(f)
+
+  print(f "dimentions: {img.ndim}")
+  if img.ndim == 3:
+    img = np.max(img, axis=0)
+
   masks, flows, styles = model.eval(img, normalize={"tile_norm_blocksize": 256})
 
   num_cells = len(np.unique(masks)) - 1  # subtract 1 for background
