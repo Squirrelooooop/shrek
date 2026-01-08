@@ -11,7 +11,7 @@ io.logger_setup() # run this to get printing of progress
 model = models.CellposeModel()
 
 # *** change to your google drive folder path ***
-dir = Path("/Users/sunny/Desktop/Kelly_data/")
+dir = Path("/Users/sunny/Desktop/Data/20250728_IvanHEK_TRPA1/image/multipage_tiff")
 output_csv = dir / 'cell_counts.csv' 
 
 image_ext = ".tif"
@@ -26,7 +26,7 @@ for f in files:
   print(f.name)
   img = tifffile.imread(f)
 
-  print(f "dimentions: {img.ndim}")
+  print(f"dimentions", img.ndim)
   if img.ndim == 3:
     img = np.max(img, axis=0)
 
