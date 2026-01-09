@@ -9,7 +9,7 @@ import scipy.io as sio
 import torch
 
 io.logger_setup() # run this to get printing of progress
-if torch.backends.mps.is_available():
+if torch.backends.mps.is_available(): 
     device = "mps"
     print("Using Apple GPU (MPS) for Cellpose")
 else:
@@ -39,7 +39,10 @@ for f in files:
   print(f"dimentions", img.ndim)
   if img.ndim == 3:
     img = np.max(img, axis=0)
-
+    #save max projection as new tiff
+    max_proj_path = dir / f"{f.stem}_maxproj{image_ext}"
+    tifffile.imwrite(max_proj_path, img)
+    print("Saved max projection:", max_proj_path)
   img_tensor = torch.from_numpy(img).to(torch.float32).to(torch_device)
   masks, flows, styles = model.eval(img_tensor, normalize={"tile_norm_blocksize": 256})
 
@@ -59,9 +62,14 @@ for f in files:
   for i, cid in enumerate(cell_ids):
     masks_3d[:, :, i] = (masks == cid).astype(np.uint8)
 
-  mat_path = dir / f"{f.stem}_masks_3d.mat"
-  sio.savemat(mat_path, {"masks_3d": masks_3d})
-  print("Saved 3D mask .mat:", mat_path)
+# Save as multipage TIFF
+output_tiff = dir / f"{f.stem}_cells_stack.tif"
+tifffile.imwrite(output_tiff, masks_3d, photometric='minisblack')
+
+
+mat_path = dir / f"{f.stem}_masks_3d.mat"
+sio.savemat(mat_path, {"masks_3d": masks_3d})
+print("Saved 3D mask .mat:", mat_path)
 
 
 # save results to csv
