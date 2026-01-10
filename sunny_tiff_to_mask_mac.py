@@ -21,7 +21,7 @@ torch_device = torch.device("mps" if torch.backends.mps.is_available() else "cpu
 model = models.CellposeModel(device=torch_device)
 
 # *** change to your google drive folder path ***
-dir = Path("/Users/sunny/Desktop/Data/20250728_IvanHEK_TRPA1/image/multipage_tiff")
+dir = Path("/Users/sunny/Desktop/Data/20250725_IvanHEK_MscL/all_ome_tiff/multipage_tiff/ds")
 output_csv = dir / 'cell_counts.csv' 
 
 image_ext = ".tif"
@@ -62,14 +62,10 @@ for f in files:
   for i, cid in enumerate(cell_ids):
     masks_3d[:, :, i] = (masks == cid).astype(np.uint8)
 
-# Save as multipage TIFF
-output_tiff = dir / f"{f.stem}_cells_stack.tif"
-tifffile.imwrite(output_tiff, masks_3d, photometric='minisblack')
 
-
-mat_path = dir / f"{f.stem}_masks_3d.mat"
-sio.savemat(mat_path, {"masks_3d": masks_3d})
-print("Saved 3D mask .mat:", mat_path)
+  mat_path = dir / f"{f.stem}_masks_3d.mat"
+  sio.savemat(mat_path, {"masks_3d": masks_3d})
+  print("Saved 3D mask .mat:", mat_path)
 
 
 # save results to csv

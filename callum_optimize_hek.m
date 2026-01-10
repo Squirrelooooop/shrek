@@ -1,12 +1,12 @@
 clear; clc;
 
 % Folder containing TIFF files and masks
-folder = '/Users/sunny/Desktop/Data/20250728_IvanHEK_TRPA1/image/multipage_tiff/ds/';
+folder = '/Users/sunny/Desktop/Data/20250725_IvanHEK_MscL/all_ome_tiff/multipage_tiff/ds/';
 
 % List all TIFF files in the folder (ignore masks)
 filelist = dir(fullfile(folder, '*.tif'));
 files = {filelist.name};
-files = files(~contains(files,'masks'));          % remove mask files if any
+files = files(~contains(files,["masks","maxproj"]));          % remove mask files if any
 expnumbers = erase(files, '.tif');                % base filenames without extension
 
 %% Loop through each experiment
@@ -57,7 +57,7 @@ for ifil = 1:length(expnumbers)
     DFoverF = (F - F0) ./ F0;
 
     %% --- Time vector ---
-    dt = 0.06;                      % frame interval (s)
+    dt = 0.6;                      % frame interval (s)
     t = (0:nFrames-1)' * dt;
 
     %% --- Save results ---
