@@ -1,7 +1,7 @@
 clear; clc;
 
 % Folder containing TIFF files and masks
-folder = '/Users/sunny/Desktop/Data/20250725_IvanHEK_MscL/all_ome_tiff/multipage_tiff/ds/';
+folder = '/Users/sunny/Desktop/20260115_flyc_chloron/multipage_tiff/ds/motion_corrected/';
 
 % List all TIFF files in the folder (ignore masks)
 filelist = dir(fullfile(folder, '*.tif'));
@@ -51,7 +51,7 @@ for ifil = 1:length(expnumbers)
     end
 
     %% --- Compute ΔF/F ---
-    numBaselineFrames = 15; 
+    numBaselineFrames = 100; 
     F0 = mean(F(1:numBaselineFrames, :), 1);  % 1 = compute mean along rows (frames)
 
     DFoverF = (F - F0) ./ F0;

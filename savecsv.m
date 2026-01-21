@@ -1,4 +1,4 @@
-matFiles = dir(fullfile('/Users/sunny/Desktop/Data/20250725_IvanHEK_MscL/all_ome_tiff/multipage_tiff/ds/', '*.mat'));
+matFiles = dir(fullfile('/Users/sunny/Desktop/20260115_flyc_chloron/multipage_tiff/ds/motion_corrected/', '*.mat'));
 
 for k = 1:length(matFiles)
     % Load the .mat file
@@ -14,12 +14,16 @@ for k = 1:length(matFiles)
         continue;
     end
     
+    % Create cell ID vector (1..nCells)
+    nCells = size(arrayToSave, 2);
+    cellIDs = 1:nCells;
+
+    % Combine IDs as first row for CSV
+    arrayToWrite = [cellIDs; data.DFoverF];  % first row = cell IDs
+
     % Write to CSV (same folder as .mat)
-    csvFilename = fullfile( ...
-        matFiles(k).folder, ...
-        strrep(matFiles(k).name, '.mat', '.csv') ...
-    );
-    
-    writematrix(data.DFoverF, csvFilename);
+    csvFilename = fullfile(matFiles(k).folder, strrep(matFiles(k).name, '.mat', '.csv'));
+    writematrix(arrayToWrite, csvFilename);
+
     fprintf('Saved %s\n', csvFilename);
 end

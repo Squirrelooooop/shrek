@@ -2,8 +2,8 @@
 close all;
 clc;
 clearvars
-pIn = '/Users/sunny/Desktop/Data/20250725_IvanHEK_MscL/all_ome_tiff/multipage_tiff/'; %% input file folder
-pOut = '/Users/sunny/Desktop/Data/20250725_IvanHEK_MscL/all_ome_tiff/multipage_tiff/ds/'; %% the folder for output results. Note that it ends with \.
+pIn = '/Users/sunny/Desktop/20260115_flyc_chloron/multipage_tiff/'; %% input file folder
+pOut = '/Users/sunny/Desktop/20260115_flyc_chloron/multipage_tiff/ds/'; %% the folder for output results. Note that it ends with \.
 
 %check pOut, if none, make dir
 if ~exist(pOut, 'dir')
