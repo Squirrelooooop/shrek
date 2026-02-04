@@ -12,7 +12,7 @@ def main():
     # PARAMETERS
     # ------------------------------
 
-    input_dir = Path("/Users/sunny/Desktop/20260115_flyc_chloron/multipage_tiff/ds")
+    input_dir = Path("/Users/sunny/Desktop/ChlorON_01292026_EQ_PosCtrl/ds/")
     output_dir = input_dir / "motion_corrected"
     output_dir.mkdir(exist_ok=True)
 
@@ -23,11 +23,11 @@ def main():
     template_dir.mkdir(exist_ok=True)  # make folder if it doesn't exist
 
 
-    max_shifts = (300, 300)       # maximum rigid shift (pixels)
+    max_shifts = (60, 60)       # maximum rigid shift (pixels)
     strides = (48, 48)          # patch size stride for pw-rigid
     overlaps = (24, 24)         # patch overlap
     max_deviation_rigid = 3     # maximum deviation per patch
-    pw_rigid = False            # rigid or piecewise-rigid
+    pw_rigid = True            # rigid or piecewise-rigid
     shifts_opencv = True        # use bicubic interpolation
     border_nan = 'copy'         # replicate border values
     nonneg_movie = True         # ensure movie values stay >=0

@@ -1,7 +1,7 @@
 clear; clc;
 
 % Folder containing TIFF files and masks
-folder = '/Users/sunny/Desktop/20260115_flyc_chloron/multipage_tiff/ds/motion_corrected/';
+folder = '/Users/sunny/Desktop/ChlorON_01292026_EQ_PosCtrl/ds/motion_corrected/';
 
 % List all TIFF files in the folder (ignore masks)
 filelist = dir(fullfile(folder, '*.tif'));
@@ -49,15 +49,32 @@ for ifil = 1:length(expnumbers)
             F(iframe, icell) = mean(slice(mask),'all');
         end
     end
+    
+    %% --- Load background mask --
+    bgpath = fullfile(folder, [expnumber, '_bg.mat']);
+    if ~exist(bgpath, 'file')
+        warning('Background file not found: %s', bgpath);
+        continue;
+    end
+    load(bgpath, 'bg');  % ensure variable is bg
+
+    %% --- Process background fluorescence ---
+    F_bg = zeros(nFrames, 1);
+
+    for iframe = 1:nFrames
+        frame = thisPage(:, :, iframe);
+        F_bg(iframe) = mean(frame(bg), 'all');
+    end
 
     %% --- Compute ΔF/F ---
-    numBaselineFrames = 100; 
-    F0 = mean(F(1:numBaselineFrames, :), 1);  % 1 = compute mean along rows (frames)
+    numBaselineFrames = 160; 
+    F_corrected = F - F_bg; % normalize by background 
+    F0 = mean(F_corrected(1:numBaselineFrames, :), 1);  % 1 = compute mean along rows (frames)
 
-    DFoverF = (F - F0) ./ F0;
+    DFoverF = (F_corrected - F0) ./ F0;
 
     %% --- Time vector ---
-    dt = 0.6;                      % frame interval (s)
+    dt = 1.8;                      % frame interval (s)
     t = (0:nFrames-1)' * dt;
 
     %% --- Save results ---

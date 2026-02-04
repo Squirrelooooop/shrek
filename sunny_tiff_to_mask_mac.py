@@ -21,8 +21,8 @@ torch_device = torch.device("mps" if torch.backends.mps.is_available() else "cpu
 model = models.CellposeModel(device=torch_device)
 
 # *** change to your google drive folder path ***
-dir = Path("/Users/sunny/Desktop/20260115_flyc_chloron/multipage_tiff/ds/motion_corrected/")
-snap = Path("/Users/sunny/Desktop/20260115_flyc_chloron/multipage_tiff/ds/")
+dir = Path("//Users/sunny/Desktop/ChlorON_01292026_EQ_PosCtrl/ds/motion_corrected/")
+snap = Path("/Users/sunny/Desktop/ChlorON_01292026_EQ_PosCtrl/")
 output_csv = dir / 'cell_counts.csv' 
 
 image_ext = ".tif"
@@ -48,7 +48,7 @@ for f in files:
   masks, flows, styles = model.eval(img_tensor, normalize={"tile_norm_blocksize": 256})
 
   cell_ids = np.unique(masks)
-  cell_ids = cell_ids[cell_ids != 0]  # ignore background
+  cell_ids = cell_ids[cell_ids != 0] #remove background
 
   # Determine snapshot file
   prefix = f.stem.split('_')[0]
@@ -86,6 +86,11 @@ for f in files:
         'cells_in_snapshot': len(cell_ids_in_snap),
         'cell_ids_in_snapshot': ','.join(map(str, cell_ids_in_snap))
     })
+    
+  bg_mask = (masks == 0)
+  mat_bg_path = dir / f"{f.stem}_bg.mat"
+  sio.savemat(mat_bg_path, {"bg": bg_mask})
+  print("Saved MATLAB background mask:", mat_bg_path)
 
 # save results to csv
 pd.DataFrame(results).to_csv(output_csv, index=False)
