@@ -39,17 +39,6 @@ for ifil = 1:length(expnumbers)
     BW = imbinarize(masks_3d);
     nCells = size(BW,3);
 
-    %% --- Extract fluorescence per cell ---
-    F = zeros(nFrames, nCells);
-
-    for icell = 1:nCells
-        mask = BW(:,:,icell);
-        for iframe = 1:nFrames
-            slice = thisPage(:,:,iframe);       % <- FIX: assign frame to temp variable
-            F(iframe, icell) = mean(slice(mask),'all');
-        end
-    end
-    
     %% --- Load background mask --
     bgpath = fullfile(folder, [expnumber, '_bg.mat']);
     if ~exist(bgpath, 'file')
@@ -57,6 +46,41 @@ for ifil = 1:length(expnumbers)
         continue;
     end
     load(bgpath, 'bg');  % ensure variable is bg
+    
+    %% --- GLOBAL BLEACHING CORRECTION (background-based) ---
+    % 1) compute background bleaching trace
+    bgTrace = zeros(1, nFrames);
+    for t = 1:nFrames
+        frame = thisPage(:,:,t);
+        bgTrace(t) = mean(frame(bg), 'all');
+    end
+    bgTrace = bgTrace / bgTrace(1);   % normalize
+
+    % 2) fit exponential decay
+    x = 1:nFrames;
+    myFitType = fittype(@(a,b,c,d,x) a*exp(-b*x.^d) + c);
+
+    myFit = fit(x', bgTrace', myFitType, ...
+        'Lower', [0,0,0,0], ...
+        'Upper', [inf,inf,min(bgTrace),1], ...
+        'StartPoint', [max(bgTrace)-min(bgTrace), 0, min(bgTrace), 1]);
+
+    bleachCurve = reshape(myFit(x), [1 nFrames]);
+
+    % 3) apply bleaching correction to entire movie
+    datIn = reshape(thisPage, [], nFrames);
+    datIn = datIn ./ bleachCurve;
+    thisPage = reshape(datIn, size(thisPage));
+    
+    %% --- Extract fluorescence per cell (bleach-corrected movie) ---
+    F = zeros(nFrames, nCells);
+    for icell = 1:nCells
+        mask = BW(:,:,icell);
+        for iframe = 1:nFrames
+            slice = thisPage(:,:,iframe);
+            F(iframe, icell) = mean(slice(mask),'all');
+        end
+    end
 
     %% --- Process background fluorescence ---
     F_bg = zeros(nFrames, 1);
