@@ -15,18 +15,27 @@ msPerFrame = float(input("Enter frame duration (ms): "))
 # Calculate window size for 1-second rolling mean
 window_size = int(round(1000 / msPerFrame))
 
-# Choose device (MPS for Apple GPU, else CPU)
-device = torch.device("mps") if torch.backends.mps.is_available() else torch.device("cpu")
-print(f"Using device: {device}")
+# -------------------- DEVICE SELECTION --------------------
+if torch.backends.mps.is_available():        # Mac Apple GPU
+    device = "mps"
+    print("Using Apple GPU (MPS)")
+elif torch.cuda.is_available():             # Windows/Linux NVIDIA GPU
+    device = "cuda"
+    print("Using CUDA GPU")
+else:                                       # fallback to CPU
+    device = "cpu"
+    print("Using CPU")
+
+torch_device = torch.device(device)
 
 # -------------------- FILE LIST --------------------
 files = [f for f in pIn.glob("*.tif*") if "_snap" not in f.name]
 print(f"Found {len(files)} valid files.")
 
 # -------------------- GPU SMOOTHING FUNCTION --------------------
-def smooth_time_torch(data, window_size, chunk=200):
+def smooth_time_torch(data, window_size, chunk=200, device=torch_device):
     """
-    Smooth a 3D movie along the time axis using GPU (MPS if available).
+    Smooth a 3D movie along the time axis using GPU/CPU.
     
     Parameters
     ----------
@@ -36,37 +45,38 @@ def smooth_time_torch(data, window_size, chunk=200):
         Length of rolling average
     chunk : int
         Number of frames to process at a time (memory-friendly)
-
+    device : torch.device
+        Device to run convolution on (MPS, CUDA, or CPU)
+        
     Returns
     -------
     out : np.ndarray
         Smoothed movie, same shape as input
     """
-    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-    print(f"Using device: {device}")
-    
     T, H, W = data.shape
     out = np.empty_like(data, dtype=np.float32)
     
     pad = window_size // 2
     kernel = torch.ones(1, 1, window_size, device=device) / window_size
 
+    print(f"Smoothing on device: {device}")
+
     for start in range(0, T, chunk):
         end = min(start + chunk, T)
         t0 = start
         t1 = end
         
-        # Load chunk to GPU
-        x = torch.from_numpy(data[t0:t1]).to(device)  # (frames,H,W)
-        x = x.permute(1, 2, 0).reshape(-1, 1, x.shape[0])  # (H*W,1,frames)
+        # Load chunk to device
+        x = torch.from_numpy(data[t0:t1]).to(device).float()          # (frames,H,W)
+        x = x.permute(1, 2, 0).reshape(-1, 1, x.shape[0])           # (H*W,1,frames)
         
-        # Pad on both sides along time to ensure full convolution
-        x = F.pad(x, (pad, pad), mode='replicate')
+        # Pad on both sides along time
+        x = torch.nn.functional.pad(x, (pad, pad), mode='replicate')
         
         # Convolve along time
-        y = F.conv1d(x, kernel, padding=0)
+        y = torch.nn.functional.conv1d(x, kernel, padding=0)
         
-        # Reshape back to (frames, H, W)
+        # Reshape back to (frames,H,W)
         y = y.reshape(H, W, -1).permute(2, 0, 1)
         
         # Slice exactly to original chunk length
