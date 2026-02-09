@@ -1,4 +1,4 @@
-matFiles = dir(fullfile('/Users/sunny/Desktop/ChlorON_01292026_EQ_PosCtrl/ds/motion_corrected/', '*.mat'));
+matFiles = dir(fullfile('/Users/sunny/Desktop/extra/multipage_tiff/ds/motion_corrected/', '*.mat'));
 
 for k = 1:length(matFiles)
     % Load the .mat file

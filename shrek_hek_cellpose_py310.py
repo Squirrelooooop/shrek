@@ -20,7 +20,7 @@ def ome_sort_key(path: Path):
         return 9999
 
 
-def merge_ome_to_multipage(input_dir, output_dir=None):
+def ometotiff(input_dir, output_dir=None):
     """
     Merge OME-TIFF files inside each subfolder into one multipage TIFF.
 

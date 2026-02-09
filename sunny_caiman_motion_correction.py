@@ -12,7 +12,7 @@ def main():
     # PARAMETERS
     # ------------------------------
 
-    input_dir = Path("/Users/sunny/Desktop/20260126_IvanHEK_FLYChlorOn/multipage_tiff/ds/")
+    input_dir = Path("/Users/sunny/Desktop/extra/multipage_tiff/ds")
     output_dir = input_dir / "motion_corrected"
     output_dir.mkdir(exist_ok=True)
 
