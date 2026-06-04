@@ -1,0 +1,10 @@
+name: caiman
+channels:
+  - conda-forge
+dependencies:
+  - caiman
+  - cython
+  - numpydoc
+  - yapf
+  - moviepy
+prefix: /Users/sunny/miniforge3/envs/caiman

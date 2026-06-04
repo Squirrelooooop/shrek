@@ -1,0 +1,13 @@
+name: cellpose_py310
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - scikit-image
+  - ipykernel
+  - matplotlib
+  - pandas
+  - pytorch
+  - tifffile
+  - numpy
+prefix: /Users/sunny/miniforge3/envs/cellpose_py310

@@ -1,4 +1,4 @@
-matFiles = dir(fullfile('/Users/sunny/Desktop/extra/multipage_tiff/ds/motion_corrected/', '*.mat'));
+matFiles = dir(fullfile('/Users/sunny/Desktop/20260427_ARPA_Demo/multipage_tiff/ds/motion_corrected/', '*.mat'));
 
 for k = 1:length(matFiles)
     % Load the .mat file
@@ -19,7 +19,7 @@ for k = 1:length(matFiles)
     cellIDs = 1:nCells;
 
     % Combine IDs as first row for CSV
-    arrayToWrite = [cellIDs; data.DFoverF];  % first row = cell IDs
+    arrayToWrite = [cellIDs; data.F];  % first row = cell IDs
 
     % Write to CSV (same folder as .mat)
     csvFilename = fullfile(matFiles(k).folder, strrep(matFiles(k).name, '.mat', '.csv'));

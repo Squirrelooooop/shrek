@@ -1,7 +1,7 @@
 clear; clc;
 
 % Folder containing TIFF files and masks
-folder = '/Users/sunny/Desktop/extra/multipage_tiff/ds/motion_corrected/';
+folder = '/Users/sunny/Desktop/20260427_ARPA_Demo/multipage_tiff/ds/motion_corrected/';
 
 % List all TIFF files in the folder (ignore masks)
 filelist = dir(fullfile(folder, '*.tif'));
@@ -23,7 +23,7 @@ for ifil = 1:length(expnumbers)
 
     info = imfinfo(tifpath);
     nFrames = numel(info);
-    thisPage = zeros(info(1).Height, info(1).Width, nFrames, 'like', imread(tifpath,1));
+    thisPage = zeros(info(1).Height, info(1).Width, nFrames, 'double');
 
     for k = 1:nFrames
         thisPage(:,:,k) = imread(tifpath, k);
@@ -91,14 +91,14 @@ for ifil = 1:length(expnumbers)
     end
 
     %% --- Compute ΔF/F ---
-    numBaselineFrames = 120; 
+    numBaselineFrames = 1; 
     F_corrected = F - F_bg; % normalize by background 
     F0 = mean(F_corrected(1:numBaselineFrames, :), 1);  % 1 = compute mean along rows (frames)
 
     DFoverF = (F_corrected - F0) ./ F0;
 
     %% --- Time vector ---
-    dt = 1;                      % frame interval (s)
+    dt = 0.6;                      % frame interval (s)
     t = (0:nFrames-1)' * dt;
 
     %% --- Save results ---
