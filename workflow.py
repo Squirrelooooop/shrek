@@ -1,6 +1,6 @@
 import shrek_hek_cellpose_py310 as cp
 
-# convert ome-tiff to multipage tiff
+# convert ome-tiff to multipage tiff (for the inverted only)
 #cp.ometotiff(input_dir = "/Users/sunny/Desktop/20260427_ARPA_Demo/")
 
 # downsample the multipage tiff
