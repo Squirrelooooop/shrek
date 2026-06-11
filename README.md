@@ -64,11 +64,11 @@ As current workflow of the imaging analysis: convert the video to multipage tiff
 
 8. Actual analysis of the calcium data. Depending on which coding language you use, most prefer outputs as csv files. This step convert all output files needed for plot to csv.
 
-  1) CaIData: open savecsv.m, change the input directory to to where you store CalData output files ```matFiles = dir(fullfile('foldwe_path_of_your_CalData_files', '*.mat'));```
+  (1) CaIData: open savecsv.m, change the input directory to to where you store CalData output files ```matFiles = dir(fullfile('foldwe_path_of_your_CalData_files', '*.mat'));```
 
      Pay attention to ```arrayToWrite = [cellIDs; data.F];```. This saves the raw F value. If you want the dF/F calculated in callum_optimize_hek.m replace this to ```arrayToWrite = [cellIDs; data.DFoverF]```, but I recommend to start with raw F values.
 
-  2) Timestamp. If you use TimestampSunny.m during your recording session to note down the exact timing of camera-On and ultrasound-On, then you can use this to output the timing of the ultrasound and match this with your calcium traces. Change the directory of where you store the timestamp matlab files and where want to put the csv files:
+  (2) Timestamp. If you use TimestampSunny.m during your recording session to note down the exact timing of camera-On and ultrasound-On, then you can use this to output the timing of the ultrasound and match this with your calcium traces. Change the directory of where you store the timestamp matlab files and where want to put the csv files:
      ```folder = 'input_folder_path'; out_folder = 'output_folder_must_be_created_before_running_this_script';```
 
 9. Run the rest of the analysis in your familiar coding languages. Good Luck! If you r using R/Rstudio, check the server/ARPA/CalciumImaging folders to see if you can use scripts from previous experiments, especially if you r following the same imaging protocol. 
