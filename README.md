@@ -50,7 +50,7 @@ As current workflow of the imaging analysis: convert the video to multipage tiff
 
    Keep the first line uncommented (dont change this line), uncomment ```cp.downsample(input_dir = "/Users/Your_tif_folder_path/", msPerFrame=60, ds_factor = 10)```. Remember to change the msPerFrame to your actual calcium recording frame interval.
 
-4. Do the motion correction in sunny_caiman_motion_correction.py and remember to change the conda env to caiman
+4. Do the motion correction in sunny_caiman_motion_correction.py and remember to change the conda env to caiman (Optional)
 
    Open sunny_caiman_motion_correction.py with VS Code, switch to caiman environment: From the top search bar choose "Show and Run Commands >", then "Python: Select Interpreter", and then choose caiman.
 
@@ -60,7 +60,18 @@ As current workflow of the imaging analysis: convert the video to multipage tiff
 
 6. Cellpose: go back to workflow.py > comment every lines of code except for the first and last line. Change the input_dir to your folder path storing motion corrected tifs (have "_mc" in the filename). If you have snap tif as tag+ reference, add the folder path of where you store those tiffs to snap_dir = "". Then hit run.
 
-7. MATLAB. 
+7. MATLAB: run callum_optimize_hek.m with MATLAB. Change the input directory ```folder = '';``` to your cellpose output folder. Pay attention to the sector %% --- Time vector ---; you may need to change dt = time interval between frames of your downsampled tif.
+
+8. Actual analysis of the calcium data. Depending on which coding language you use, most prefer outputs as csv files. This step convert all output files needed for plot to csv.
+
+  1) CaIData: open savecsv.m, change the input directory to to where you store CalData output files ```matFiles = dir(fullfile('foldwe_path_of_your_CalData_files', '*.mat'));```
+
+     Pay attention to ```arrayToWrite = [cellIDs; data.F];```. This saves the raw F value. If you want the dF/F calculated in callum_optimize_hek.m replace this to ```arrayToWrite = [cellIDs; data.DFoverF]```, but I recommend to start with raw F values.
+
+  2) Timestamp. If you use TimestampSunny.m during your recording session to note down the exact timing of camera-On and ultrasound-On, then you can use this to output the timing of the ultrasound and match this with your calcium traces. Change the directory of where you store the timestamp matlab files and where want to put the csv files:
+     ```folder = 'input_folder_path'; out_folder = 'output_folder_must_be_created_before_running_this_script';```
+
+9. Run the rest of the analysis in your familiar coding languages. Good Luck! If you r using R/Rstudio, check the server/ARPA/CalciumImaging folders to see if you can use scripts from previous experiments, especially if you r following the same imaging protocol. 
    
 
 
