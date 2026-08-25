@@ -4,25 +4,28 @@ from tifffile import TiffWriter
 import re
 
 # paths
-input_dir = Path("/Users/sunny/Desktop/20260115_flyc_chloron")              # folder with .ome.tif files
+input_dir = Path("/Users/sunny/Desktop/20260819_FrodoNeu_v37")              # folder with .ome.tif files
 output_dir = input_dir / "multipage_tiff"    # output folder
 output_dir.mkdir(exist_ok=True)
 
+OME_SUFFIX_RE = re.compile(r"_(\d+)\.ome\.tiff?$", re.IGNORECASE)
+
 def ome_sort_key(path):
-    name = path.name
-    m = re.search(r"_Default_(\d+)\.ome\.tif$", name)
-    if m:
-        return int(m.group(1))
-    elif name.endswith("_Default.ome.tif"):
-        return 0
-    else:
-        return 9999
+    # MicroManager names the first chunk "<prefix>.ome.tif(f)" and later
+    # chunks "<prefix>_1.ome.tif(f)", "<prefix>_2.ome.tif(f)", ... Whatever
+    # <prefix> is (Default, Pos0, a series name, ...), the chunk index is
+    # always the last "_<N>" right before the extension, so match that
+    # generically instead of a hardcoded prefix - a hardcoded prefix left
+    # every file with the same sort key (scrambling the stitch order) as
+    # soon as the real filenames didn't match it.
+    m = OME_SUFFIX_RE.search(path.name)
+    return int(m.group(1)) if m else 0
 
 
 for subfolder in sorted(p for p in input_dir.iterdir() if p.is_dir()):
 
     ome_files = sorted(
-        subfolder.glob("*.ome.tif"),
+        (p for p in subfolder.iterdir() if re.search(r"\.ome\.tiff?$", p.name, re.IGNORECASE)),
         key=ome_sort_key
     )
 
